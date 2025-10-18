@@ -116,7 +116,6 @@ html, body {
   </style>
 </head>
 <body>
-  <div class="enter-overlay" id="enterOverlay">click to enter</div>
   <div class="content">
     <div class="name">spice</div>
     <div class="links">
@@ -144,16 +143,10 @@ html, body {
 
   <script>
     const audio = document.getElementById('audio');
-    const overlay = document.getElementById('enterOverlay');
-    audio.volume = 0.35;
-
-    window.addEventListener('load', () => {
-      overlay.addEventListener('click', () => {
-        audio.play();
-        overlay.classList.add('hidden');
-      }, { once: true });
-    });
+    audio.volume = 0.7;
+    audio.play()
   </script>
 </body>
 </html>
+
 
