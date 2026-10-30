@@ -239,10 +239,11 @@
     const startup = document.getElementById('startup');
     const content = document.getElementById('content');
     const canvas = document.getElementById('visualizer');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
 
     const targetVolume = 0.35;
     const fadeDuration = 1800;
+    const frameInterval = 1000 / 30;
 
     let fadeInterval = null;
     let fadeToken = 0;
@@ -251,8 +252,10 @@
     let analyser = null;
     let frequencyData = null;
     let animationFrame = null;
+    let lastFrame = 0;
     let currentZoom = 1;
     let currentBackgroundZoom = 1;
+    let isActive = true;
 
     audio.volume = 0;
 
@@ -294,8 +297,8 @@
 
       audioContext = new AudioContext();
       analyser = audioContext.createAnalyser();
-      analyser.fftSize = 128;
-      analyser.smoothingTimeConstant = 0.65;
+      analyser.fftSize = 64;
+      analyser.smoothingTimeConstant = 0.7;
 
       const source = audioContext.createMediaElementSource(audio);
 
@@ -303,21 +306,22 @@
       analyser.connect(audioContext.destination);
 
       frequencyData = new Uint8Array(analyser.frequencyBinCount);
-
-      drawVisualizer();
     }
 
-    function drawVisualizer() {
+    function drawVisualizer(timestamp) {
       animationFrame = requestAnimationFrame(drawVisualizer);
 
-      if (!analyser) return;
+      if (!isActive || !analyser) return;
+
+      if (timestamp - lastFrame < frameInterval) return;
+      lastFrame = timestamp;
 
       analyser.getByteFrequencyData(frequencyData);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const barCount = 32;
-      const gap = 5;
+      const barCount = 16;
+      const gap = 7;
       const barWidth = (canvas.width - gap * (barCount - 1)) / barCount;
 
       for (let i = 0; i < barCount; i++) {
@@ -337,23 +341,26 @@
         ctx.fill();
       }
 
-      const bass = frequencyData.slice(0, 5);
-      const bassLevel = bass.reduce((sum, value) => sum + value, 0) / bass.length;
+      const bassLevel = (
+        frequencyData[0] +
+        frequencyData[1] +
+        frequencyData[2]
+      ) / 3;
 
       const bassAmount = bassLevel / 255;
 
       const targetZoom = 1 + bassAmount * 0.08;
       const targetBackgroundZoom = 1 + bassAmount * 0.13;
 
-      currentZoom += (targetZoom - currentZoom) * 0.2;
-      currentBackgroundZoom += (targetBackgroundZoom - currentBackgroundZoom) * 0.2;
+      currentZoom += (targetZoom - currentZoom) * 0.25;
+      currentBackgroundZoom += (targetBackgroundZoom - currentBackgroundZoom) * 0.25;
 
       if (hasStarted) {
         content.style.transform = `translateY(0) scale(${currentZoom})`;
 
         document.documentElement.style.setProperty(
           '--background-zoom',
-          currentBackgroundZoom
+          currentBackgroundZoom.toFixed(4)
         );
       }
     }
@@ -376,6 +383,10 @@
         console.log("Audio playback failed:", error);
       }
 
+      if (isActive) {
+        animationFrame = requestAnimationFrame(drawVisualizer);
+      }
+
       document.removeEventListener('keydown', startWebsite);
     }
 
@@ -384,14 +395,26 @@
     function checkFocus() {
       if (!hasStarted) return;
 
-      if (!document.hidden && document.hasFocus()) {
+      isActive = !document.hidden && document.hasFocus();
+
+      if (isActive) {
         audioContext.resume();
 
         audio.play().then(() => {
           fadeAudio(targetVolume);
         }).catch(() => {});
+
+        if (!animationFrame) {
+          lastFrame = 0;
+          animationFrame = requestAnimationFrame(drawVisualizer);
+        }
       } else {
         fadeAudio(0);
+
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+        }
       }
     }
 
