@@ -31,6 +31,8 @@
       background: url('background.png') center center / cover no-repeat;
       filter: blur(7px) brightness(0.8);
       z-index: -1;
+      transform: scale(var(--background-zoom, 1));
+      will-change: transform;
     }
 
     .startup {
@@ -250,6 +252,7 @@
     let frequencyData = null;
     let animationFrame = null;
     let currentZoom = 1;
+    let currentBackgroundZoom = 1;
 
     audio.volume = 0;
 
@@ -337,12 +340,21 @@
       const bass = frequencyData.slice(0, 5);
       const bassLevel = bass.reduce((sum, value) => sum + value, 0) / bass.length;
 
-      const targetZoom = 1 + (bassLevel / 255) * 0.08;
+      const bassAmount = bassLevel / 255;
+
+      const targetZoom = 1 + bassAmount * 0.08;
+      const targetBackgroundZoom = 1 + bassAmount * 0.13;
 
       currentZoom += (targetZoom - currentZoom) * 0.2;
+      currentBackgroundZoom += (targetBackgroundZoom - currentBackgroundZoom) * 0.2;
 
       if (hasStarted) {
         content.style.transform = `translateY(0) scale(${currentZoom})`;
+
+        document.documentElement.style.setProperty(
+          '--background-zoom',
+          currentBackgroundZoom
+        );
       }
     }
 
