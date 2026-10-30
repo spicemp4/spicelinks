@@ -1,152 +1,236 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>spice</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap" rel="stylesheet">
+
   <style>
-html, body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Doto', sans-serif;
-    background: url('background.gif') center center / cover no-repeat fixed;
-    height: 100dvh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Doto', sans-serif;
+      background: url('background.gif') center center / cover no-repeat fixed;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
 
-.content {
-    text-align: center;
-    animation: fadeIn 1.4s ease;
-    z-index: 1;
-    padding: 2rem;
-}
+    .content {
+      text-align: center;
+      animation: fadeIn 1.4s ease;
+      z-index: 1;
+      padding: 2rem;
+    }
 
-.name {
-    font-size: 2.5rem;
-    font-weight: 900;
-    animation: flash 1s infinite alternate;
-    position: relative;
-    text-shadow: 0 0 8px rgba(255,255,255,0.3);
-}
+    .name {
+      font-size: 2.5rem;
+      font-weight: 900;
+      animation: flash 1s infinite alternate;
+      position: relative;
+      text-shadow: 0 0 8px rgba(255,255,255,0.3);
+    }
 
-.name:hover::after {
-    content: "creator";
-    position: absolute;
-    bottom: -1.4rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.75rem;
-    opacity: 0.7;
-}
+    .name:hover::after {
+      content: "creator";
+      position: absolute;
+      bottom: -1.4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
 
-.links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.2rem;
-    margin-top: 2rem;
-}
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-top: 2rem;
+    }
 
-.link-btn {
-    width: 32px;
-    height: 32px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(12px);
-    border-radius: 25%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.25s ease, background 0.25s ease;
-    box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    cursor: pointer;
-}
+    .link-btn {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border-radius: 25%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease, background 0.25s ease;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
 
-.link-btn:hover {
-    transform: scale(1.15);
-    background: rgba(255,255,255,0.9);
-}
+    .link-btn:hover {
+      transform: scale(1.15);
+      background: rgba(255,255,255,0.9);
+    }
 
-.link-btn img {
-    width: 22px;
-    height: 22px;
-    filter: brightness(0) invert(1);
-}
+    .link-btn img {
+      width: 22px;
+      height: 22px;
+      filter: brightness(0) invert(1);
+    }
 
-@keyframes fadeIn {
-    from {
+    @keyframes fadeIn {
+      from {
         opacity: 0;
         transform: translateY(20px);
-    }
-    to {
+      }
+      to {
         opacity: 1;
         transform: translateY(0);
+      }
     }
-}
 
-@keyframes flash {
-    0% {
+    @keyframes flash {
+      0% {
         opacity: 1;
-    }
-    100% {
+      }
+      100% {
         opacity: 0.6;
+      }
     }
-}
 
-@media (max-width: 600px) {
-    .name {
+    @media (max-width: 600px) {
+      .name {
         font-size: 2rem;
-    }
-    .link-btn {
+      }
+
+      .link-btn {
         width: 40px;
         height: 40px;
-    }
-    .link-btn img {
+      }
+
+      .link-btn img {
         width: 18px;
         height: 18px;
+      }
     }
-}
-
   </style>
 </head>
+
 <body>
+
   <div class="content">
     <div class="name">spice</div>
+
     <div class="links">
+
       <div class="link-btn" onclick="window.open('https://x.com/freakycodone', '_blank')">
-        <img src ="twitter.png" alt="tag" />
+        <img src="twitter.png" alt="Twitter" />
       </div>
+
       <div class="link-btn" onclick="window.open('https://www.roblox.com/users/167229506/profile', '_blank')">
-        <img src="roblox.png" alt="yt" />
-        </div>
+        <img src="roblox.png" alt="Roblox" />
+      </div>
+
       <div class="link-btn" onclick="window.open('https://www.tiktok.com/@freakazoid02', '_blank')">
-        <img src="tiktok.png" alt="tt" />
+        <img src="tiktok.png" alt="TikTok" />
       </div>
+
       <div class="link-btn" onclick="window.open('https://www.youtube.com/@spicebush.mp4', '_blank')">
-        <img src="youtube.png" alt="yt" />
+        <img src="youtube.png" alt="YouTube" />
       </div>
+
       <div class="link-btn" onclick="window.open('https://discord.com/users/spicebush07', '_blank')">
-        <img src="discord.png" alt="dc" />
+        <img src="discord.png" alt="Discord" />
       </div>
+
     </div>
   </div>
 
-  <audio id="audio" loop>
-    <source src="memories - aetunu - SoundLoadMate.com.mp3" type="audio/mp3" />
+  <!-- Background Music -->
+  <audio id="audio" loop preload="auto">
+    <source src="Hollywood_Baby_100_gecs.mp3" type="audio/mpeg" />
   </audio>
 
   <script>
     const audio = document.getElementById('audio');
-    audio.volume = 0.7;
-    audio.play()
+
+    const targetVolume = 0.7;
+    const fadeDuration = 1200;
+
+    let hasStarted = false;
+    let fadeInterval = null;
+
+    audio.volume = 0;
+
+    // Smooth volume transition
+    function fadeAudio(target) {
+      clearInterval(fadeInterval);
+
+      const steps = 30;
+      const intervalTime = fadeDuration / steps;
+      const startVolume = audio.volume;
+      const difference = target - startVolume;
+      let step = 0;
+
+      fadeInterval = setInterval(() => {
+        step++;
+
+        audio.volume = Math.max(
+          0,
+          Math.min(1, startVolume + difference * (step / steps))
+        );
+
+        if (step >= steps) {
+          clearInterval(fadeInterval);
+          fadeInterval = null;
+
+          audio.volume = target;
+
+          if (target === 0) {
+            audio.pause();
+          }
+        }
+      }, intervalTime);
+    }
+
+    // Check whether the website is visible and focused
+    function checkFocus() {
+      const isActive = !document.hidden && document.hasFocus();
+
+      if (!hasStarted) return;
+
+      if (isActive) {
+        audio.play().then(() => {
+          fadeAudio(targetVolume);
+        }).catch(() => {});
+      } else {
+        fadeAudio(0);
+      }
+    }
+
+    // Start music after the visitor's first interaction
+    document.addEventListener('click', function startMusic() {
+      if (document.hidden || !document.hasFocus()) return;
+
+      hasStarted = true;
+
+      audio.play().then(() => {
+        fadeAudio(targetVolume);
+      }).catch(() => {});
+
+      document.removeEventListener('click', startMusic);
+    });
+
+    // Detect tab changes and browser focus changes
+    document.addEventListener('visibilitychange', checkFocus);
+    window.addEventListener('blur', checkFocus);
+    window.addEventListener('focus', checkFocus);
+
   </script>
+
 </body>
 </html>
-
-
