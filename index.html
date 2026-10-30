@@ -150,7 +150,6 @@
     </div>
   </div>
 
-  <!-- Background Music -->
   <audio id="audio" loop preload="auto">
     <source src="Hollywood_Baby_100_gecs.mp3" type="audio/mpeg" />
   </audio>
@@ -161,22 +160,26 @@
     const targetVolume = 0.7;
     const fadeDuration = 1200;
 
-    let hasStarted = false;
     let fadeInterval = null;
+    let fadeToken = 0;
+    let hasStarted = false;
 
     audio.volume = 0;
 
-    // Smooth volume transition
     function fadeAudio(target) {
       clearInterval(fadeInterval);
 
-      const steps = 30;
+      const token = ++fadeToken;
+      const steps = 40;
       const intervalTime = fadeDuration / steps;
+
       const startVolume = audio.volume;
       const difference = target - startVolume;
       let step = 0;
 
       fadeInterval = setInterval(() => {
+        if (token !== fadeToken) return;
+
         step++;
 
         audio.volume = Math.max(
@@ -187,7 +190,6 @@
         if (step >= steps) {
           clearInterval(fadeInterval);
           fadeInterval = null;
-
           audio.volume = target;
 
           if (target === 0) {
@@ -197,39 +199,32 @@
       }, intervalTime);
     }
 
-    // Check whether the website is visible and focused
     function checkFocus() {
       const isActive = !document.hidden && document.hasFocus();
 
-      if (!hasStarted) return;
-
       if (isActive) {
         audio.play().then(() => {
-          fadeAudio(targetVolume);
-        }).catch(() => {});
+          hasStarted = true;
+
+          if (!document.hidden && document.hasFocus()) {
+            fadeAudio(targetVolume);
+          }
+        }).catch(error => {
+          console.log("Browser blocked autoplay:", error);
+        });
       } else {
-        fadeAudio(0);
+        if (hasStarted) {
+          fadeAudio(0);
+        }
       }
     }
 
-    // Start music after the visitor's first interaction
-    document.addEventListener('click', function startMusic() {
-      if (document.hidden || !document.hasFocus()) return;
+    checkFocus();
 
-      hasStarted = true;
-
-      audio.play().then(() => {
-        fadeAudio(targetVolume);
-      }).catch(() => {});
-
-      document.removeEventListener('click', startMusic);
-    });
-
-    // Detect tab changes and browser focus changes
     document.addEventListener('visibilitychange', checkFocus);
-    window.addEventListener('blur', checkFocus);
     window.addEventListener('focus', checkFocus);
-
+    window.addEventListener('blur', checkFocus);
+    window.addEventListener('load', checkFocus);
   </script>
 
 </body>
