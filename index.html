@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,11 +34,45 @@
       z-index: -1;
     }
 
+    .startup {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      cursor: pointer;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .startup-text {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #292929;
+      animation: flash 1s infinite alternate;
+      text-shadow: 0 0 8px rgba(0,0,0,0.15);
+    }
+
+    .startup.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     .content {
       text-align: center;
-      animation: fadeIn 1.4s ease;
-      z-index: 1;
       padding: 2rem;
+      opacity: 0;
+      transform: translateY(15px) scale(1);
+      transition: opacity 1.5s ease, transform 0.2s ease;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .content.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
     }
 
     .name {
@@ -50,7 +85,7 @@
     }
 
     .name:hover::after {
-      content: "transfem!! 🏳️‍⚧️🏳️‍⚧️";
+      content: "transfem!! 🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️";
       position: absolute;
       bottom: -1.4rem;
       left: 50%;
@@ -94,15 +129,17 @@
       opacity: 0.7;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .visualizer {
+      display: block;
+      width: 220px;
+      height: 45px;
+      margin: 1.5rem auto 0;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    .content.visible .visualizer {
+      opacity: 0.75;
     }
 
     @keyframes flash {
@@ -134,7 +171,11 @@
 
 <body>
 
-  <div class="content">
+  <div class="startup" id="startup">
+    <div class="startup-text">PRESS ANY KEY TO START</div>
+  </div>
+
+  <div class="content" id="content">
     <div class="name">kandi :33</div>
 
     <div class="links">
@@ -160,6 +201,8 @@
       </div>
 
     </div>
+
+    <canvas class="visualizer" id="visualizer" width="440" height="90"></canvas>
   </div>
 
   <audio id="audio" loop preload="auto">
@@ -168,13 +211,21 @@
 
   <script>
     const audio = document.getElementById('audio');
+    const startup = document.getElementById('startup');
+    const content = document.getElementById('content');
+    const canvas = document.getElementById('visualizer');
+    const ctx = canvas.getContext('2d');
 
     const targetVolume = 0.35;
-    const fadeDuration = 1200;
+    const fadeDuration = 1800;
 
     let fadeInterval = null;
     let fadeToken = 0;
     let hasStarted = false;
+    let audioContext = null;
+    let analyser = null;
+    let frequencyData = null;
+    let animationFrame = null;
 
     audio.volume = 0;
 
@@ -211,32 +262,104 @@
       }, intervalTime);
     }
 
-    function checkFocus() {
-      const isActive = !document.hidden && document.hasFocus();
+    function setupVisualizer() {
+      if (audioContext) return;
 
-      if (isActive) {
-        audio.play().then(() => {
-          hasStarted = true;
+      audioContext = new AudioContext();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 128;
+      analyser.smoothingTimeConstant = 0.8;
 
-          if (!document.hidden && document.hasFocus()) {
-            fadeAudio(targetVolume);
-          }
-        }).catch(error => {
-          console.log("Browser blocked autoplay:", error);
-        });
-      } else {
-        if (hasStarted) {
-          fadeAudio(0);
-        }
+      const source = audioContext.createMediaElementSource(audio);
+
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+      drawVisualizer();
+    }
+
+    function drawVisualizer() {
+      animationFrame = requestAnimationFrame(drawVisualizer);
+
+      if (!analyser) return;
+
+      analyser.getByteFrequencyData(frequencyData);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const barCount = 32;
+      const gap = 5;
+      const barWidth = (canvas.width - gap * (barCount - 1)) / barCount;
+
+      for (let i = 0; i < barCount; i++) {
+        const dataIndex = Math.floor(
+          i * frequencyData.length / barCount
+        );
+
+        const value = frequencyData[dataIndex] / 255;
+        const barHeight = Math.max(3, value * 78);
+
+        const x = i * (barWidth + gap);
+        const y = (canvas.height - barHeight) / 2;
+
+        ctx.fillStyle = '#292929';
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, 5);
+        ctx.fill();
+      }
+
+      const bass = frequencyData.slice(0, 5);
+      const bassLevel = bass.reduce((sum, value) => sum + value, 0) / bass.length;
+
+      const zoom = 1 + (bassLevel / 255) * 0.025;
+
+      if (hasStarted) {
+        content.style.transform = `translateY(0) scale(${zoom})`;
       }
     }
 
-    checkFocus();
+    async function startWebsite() {
+      if (hasStarted) return;
+
+      hasStarted = true;
+
+      startup.classList.add('hidden');
+      content.classList.add('visible');
+
+      setupVisualizer();
+
+      try {
+        await audioContext.resume();
+        await audio.play();
+        fadeAudio(targetVolume);
+      } catch (error) {
+        console.log("Audio playback failed:", error);
+      }
+
+      document.removeEventListener('keydown', startWebsite);
+    }
+
+    document.addEventListener('keydown', startWebsite);
+
+    function checkFocus() {
+      if (!hasStarted) return;
+
+      if (!document.hidden && document.hasFocus()) {
+        audioContext.resume();
+
+        audio.play().then(() => {
+          fadeAudio(targetVolume);
+        }).catch(() => {});
+      } else {
+        fadeAudio(0);
+      }
+    }
 
     document.addEventListener('visibilitychange', checkFocus);
     window.addEventListener('focus', checkFocus);
     window.addEventListener('blur', checkFocus);
-    window.addEventListener('load', checkFocus);
   </script>
 
 </body>
