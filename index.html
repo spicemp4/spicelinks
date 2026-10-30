@@ -141,6 +141,23 @@
       opacity: 0.75;
     }
 
+    .soundcloud-link {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: #292929;
+      font-size: 0.9rem;
+      text-decoration: none;
+      opacity: 0.65;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 5;
+    }
+
+    .soundcloud-link:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
     @keyframes flash {
       0% {
         opacity: 1;
@@ -203,6 +220,13 @@
 
     <canvas class="visualizer" id="visualizer" width="440" height="90"></canvas>
   </div>
+
+  <a class="soundcloud-link"
+     href="https://soundcloud.com/100gecs/hollywood-baby"
+     target="_blank"
+     rel="noopener noreferrer">
+    soundcloud ♫
+  </a>
 
   <audio id="audio" loop preload="auto">
     <source src="Hollywood_Baby_100_gecs.mp3" type="audio/mpeg" />
