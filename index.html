@@ -1,4 +1,4 @@
-a<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -324,9 +324,13 @@ a<!DOCTYPE html>
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // VISUALIZER BARS
-      const barCount = 16;
-      const gap = 8;
-      const barWidth = (canvas.width - gap * (barCount - 1)) / barCount;
+      const barCount = 10;
+      const gap = 4;
+      const barWidth = 25;
+
+      // Center the entire group of narrower bars
+      const totalWidth = barCount * barWidth + (barCount - 1) * gap;
+      const startX = (canvas.width - totalWidth) / 2;
 
       for (let i = 0; i < barCount; i++) {
         const dataIndex = Math.floor(
@@ -340,7 +344,7 @@ a<!DOCTYPE html>
 
         const barHeight = Math.max(4, amplifiedValue * 190);
 
-        const x = i * (barWidth + gap);
+        const x = startX + i * (barWidth + gap);
         const y = (canvas.height - barHeight) / 2;
 
         ctx.fillStyle = '#292929';
