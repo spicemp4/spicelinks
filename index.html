@@ -2,26 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>kandi :33</title>
+  <link rel="icon" type="image/png" href="favicon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       font-family: 'Cherry Bomb One', cursive;
-      height: 100dvh;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      min-height: 100%;
+      min-height: 100svh;
       color: #292929;
       background: transparent;
       isolation: isolate;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     body::before {
@@ -33,6 +44,8 @@
       z-index: -1;
     }
 
+    /* STARTUP SCREEN */
+
     .startup {
       position: fixed;
       inset: 0;
@@ -42,6 +55,8 @@
       z-index: 10;
       cursor: pointer;
       transition: opacity 1s ease, visibility 1s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
 
     .startup-text {
@@ -50,6 +65,8 @@
       color: #292929;
       animation: flash 1s infinite alternate;
       text-shadow: 0 0 8px rgba(0,0,0,0.15);
+      text-align: center;
+      padding: 20px;
     }
 
     .startup.hidden {
@@ -58,7 +75,11 @@
       pointer-events: none;
     }
 
+    /* MAIN CONTENT */
+
     .content {
+      width: 100%;
+      max-width: 600px;
       text-align: center;
       padding: 2rem;
       opacity: 0;
@@ -92,7 +113,10 @@
       font-size: 0.75rem;
       color: #292929;
       opacity: 0.8;
+      white-space: nowrap;
     }
+
+    /* SOCIAL LINKS */
 
     .links {
       display: flex;
@@ -114,6 +138,7 @@
       transition: transform 0.25s ease, background 0.25s ease;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .link-btn:hover {
@@ -126,12 +151,16 @@
       height: 22px;
       filter: brightness(0);
       opacity: 0.7;
+      pointer-events: none;
     }
+
+    /* AUDIO VISUALIZER */
 
     .visualizer {
       display: block;
-      width: 440px;
-      height: 100px;
+      width: min(440px, 100%);
+      height: auto;
+      aspect-ratio: 880 / 200;
       margin: 1rem auto 0;
       opacity: 0;
       transition: opacity 1.5s ease;
@@ -141,10 +170,12 @@
       opacity: 0.75;
     }
 
+    /* SOUNDCLOUD LINK */
+
     .soundcloud-link {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      right: calc(20px + env(safe-area-inset-right));
       color: #292929;
       font-size: 0.9rem;
       text-decoration: none;
@@ -158,19 +189,22 @@
       transform: scale(1.1);
     }
 
-    /* VOLUME CONTROL + FUTURE GIF PLACEHOLDER */
+    /* GIF + VOLUME CONTROLS */
+
     .bottom-left-controls {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      left: calc(20px + env(safe-area-inset-left));
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 10px;
       z-index: 5;
+
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
+
       transition: opacity 1.5s ease, visibility 1.5s ease;
     }
 
@@ -180,19 +214,25 @@
       pointer-events: auto;
     }
 
+    /* VOLUME BAR */
+
     .volume-control {
       box-sizing: border-box;
       width: 166px;
+      height: 36px;
       display: flex;
       align-items: center;
       gap: 9px;
       padding: 8px 11px;
+
       background: rgba(0, 0, 0, 0.08);
       backdrop-filter: blur(8px);
       border-radius: 20px;
+
       color: #292929;
       opacity: 0.7;
       transition: opacity 0.25s ease;
+
       flex: 0 0 auto;
     }
 
@@ -214,13 +254,17 @@
       width: auto;
       min-width: 0;
       flex: 1 1 auto;
-      height: 4px;
+      height: 6px;
+
       appearance: none;
       -webkit-appearance: none;
+
       background: rgba(41, 41, 41, 0.2);
       border-radius: 10px;
       outline: none;
       cursor: pointer;
+
+      touch-action: pan-x;
     }
 
     .volume-slider::-webkit-slider-thumb {
@@ -253,40 +297,154 @@
       user-select: none;
     }
 
+    /* FUTURE GIF PLACEHOLDER */
+
     .gif-placeholder {
       width: 166px;
       height: 166px;
       box-sizing: border-box;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
       border: 1.5px dashed rgba(41, 41, 41, 0.45);
       border-radius: 12px;
+
       background: rgba(0, 0, 0, 0.08);
       backdrop-filter: blur(8px);
+
       color: rgba(41, 41, 41, 0.65);
       font-size: 0.7rem;
       letter-spacing: 0.04em;
+
       user-select: none;
       opacity: 0.7;
       transition: opacity 0.25s ease;
+
+      flex: 0 0 auto;
     }
 
+    /* MOBILE LAYOUT */
+
     @media (max-width: 600px) {
+      body {
+        min-height: 100svh;
+        align-items: center;
+      }
+
+      .content {
+        width: 100%;
+        padding: 1.25rem;
+      }
+
+      .name {
+        font-size: clamp(1.8rem, 8vw, 2.3rem);
+      }
+
+      .links {
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .link-btn {
+        width: 42px;
+        height: 42px;
+      }
+
+      .link-btn img {
+        width: 23px;
+        height: 23px;
+      }
+
+      .visualizer {
+        width: min(360px, 85vw);
+        height: auto;
+      }
+
+      /* Make the controls larger and easier to touch */
+
       .bottom-left-controls {
-        bottom: 14px;
-        left: 14px;
-        gap: 8px;
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        left: calc(14px + env(safe-area-inset-left));
+        gap: 9px;
       }
 
-      .volume-control,
-      .gif-placeholder {
-        width: 151px;
+      .volume-control {
+        width: 220px;
+        height: 48px;
+        gap: 12px;
+        padding: 10px 13px;
+        border-radius: 24px;
+      }
+
+      .volume-icon {
+        width: 18px;
+        flex-basis: 18px;
+        font-size: 19px;
+      }
+
+      .volume-slider {
+        height: 8px;
+      }
+
+      .volume-slider::-webkit-slider-thumb {
+        width: 20px;
+        height: 20px;
+      }
+
+      .volume-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+      }
+
+      .volume-percent {
+        width: 38px;
+        flex-basis: 38px;
+        font-size: 0.85rem;
       }
 
       .gif-placeholder {
-        height: 151px;
-        border-radius: 10px;
+        width: 220px;
+        height: 220px;
+        border-radius: 14px;
+      }
+
+      .soundcloud-link {
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        right: calc(14px + env(safe-area-inset-right));
+        font-size: 0.8rem;
+      }
+    }
+
+    /* SMALL PHONES */
+
+    @media (max-width: 380px) {
+      .bottom-left-controls {
+        left: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+      }
+
+      .volume-control {
+        width: 190px;
+      }
+
+      .gif-placeholder {
+        width: 190px;
+        height: 190px;
+      }
+
+      .soundcloud-link {
+        right: 10px;
+        font-size: 0.7rem;
+      }
+
+      .content {
+        padding: 1rem;
+      }
+
+      .links {
+        gap: 0.8rem;
       }
     }
 
@@ -299,24 +457,13 @@
       }
     }
 
-    @media (max-width: 600px) {
-      .name {
-        font-size: 2rem;
-      }
+    /* REDUCE ANIMATIONS IF THE DEVICE REQUESTS IT */
 
-      .link-btn {
-        width: 40px;
-        height: 40px;
-      }
-
-      .link-btn img {
-        width: 18px;
-        height: 18px;
-      }
-
-      .visualizer {
-        width: 300px;
-        height: 70px;
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
       }
     }
   </style>
@@ -325,7 +472,9 @@
 <body>
 
   <div class="startup" id="startup">
-    <div class="startup-text">PRESS ANY KEY TO START</div>
+    <div class="startup-text" id="startupText">
+      PRESS ANY KEY TO START
+    </div>
   </div>
 
   <div class="content" id="content">
@@ -350,7 +499,7 @@
       </div>
 
       <div class="link-btn" onclick="window.open('https://soundcloud.com/spicemp4', '_blank')">
-        <img src="soundcloud.png" alt="Discord" />
+        <img src="soundcloud.png" alt="SoundCloud" />
       </div>
 
     </div>
@@ -359,10 +508,14 @@
   </div>
 
   <div class="bottom-left-controls">
-    <div class="gif-placeholder" aria-label="GIF placeholder">GIF</div>
+
+    <div class="gif-placeholder" aria-label="GIF placeholder">
+      GIF
+    </div>
 
     <div class="volume-control">
       <span class="volume-icon">♫</span>
+
       <input
         type="range"
         class="volume-slider"
@@ -372,8 +525,10 @@
         value="100"
         aria-label="Volume"
       />
+
       <span class="volume-percent" id="volumePercent">100%</span>
     </div>
+
   </div>
 
   <a class="soundcloud-link"
@@ -390,6 +545,7 @@
   <script>
     const audio = document.getElementById('audio');
     const startup = document.getElementById('startup');
+    const startupText = document.getElementById('startupText');
     const content = document.getElementById('content');
     const bottomLeftControls = document.querySelector('.bottom-left-controls');
     const canvas = document.getElementById('visualizer');
@@ -400,6 +556,18 @@
     const targetVolume = 0.175;
     const fadeDuration = 1800;
     const frameInterval = 1000 / 60;
+
+    // Detect touch-based/mobile devices.
+    const isMobile =
+      window.matchMedia('(pointer: coarse)').matches ||
+      navigator.maxTouchPoints > 0;
+
+    // Change the startup instructions depending on the device.
+    if (isMobile) {
+      startupText.textContent = 'TAP ANYWHERE TO START';
+    } else {
+      startupText.textContent = 'PRESS ANY KEY TO START';
+    }
 
     let fadeInterval = null;
     let fadeToken = 0;
@@ -414,6 +582,8 @@
     let volumeLevel = 1;
 
     audio.volume = 0;
+
+    // VOLUME SLIDER
 
     volumeSlider.addEventListener('input', () => {
       volumeLevel = Number(volumeSlider.value) / 100;
@@ -431,12 +601,15 @@
         audio.pause();
       } else if (isActive) {
         audio.volume = targetVolume * volumeLevel;
+
         if (audio.paused) {
           audioContext.resume();
           audio.play().catch(() => {});
         }
       }
     });
+
+    // AUDIO FADING
 
     function fadeAudio(target) {
       clearInterval(fadeInterval);
@@ -471,6 +644,8 @@
       }, intervalTime);
     }
 
+    // VISUALIZER SETUP
+
     function setupVisualizer() {
       if (audioContext) return;
 
@@ -488,6 +663,8 @@
       frequencyData = new Uint8Array(analyser.frequencyBinCount);
     }
 
+    // DRAW VISUALIZER
+
     function drawVisualizer(timestamp) {
       animationFrame = requestAnimationFrame(drawVisualizer);
 
@@ -501,6 +678,7 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // VISUALIZER BARS
+
       const barCount = 16;
       const gap = 8;
       const barWidth = 25;
@@ -514,9 +692,7 @@
         );
 
         const value = frequencyData[dataIndex] / 255;
-
         const amplifiedValue = Math.pow(value, 1.8);
-
         const barHeight = Math.max(4, amplifiedValue * 190);
 
         const x = startX + i * (barWidth + gap);
@@ -529,6 +705,7 @@
       }
 
       // MUSIC-REACTIVE UI ZOOM
+
       const bassLevel = (
         frequencyData[0] +
         frequencyData[1] +
@@ -546,6 +723,8 @@
       }
     }
 
+    // START WEBSITE
+
     async function startWebsite() {
       if (hasStarted) return;
 
@@ -559,6 +738,7 @@
 
       try {
         await audioContext.resume();
+
         if (volumeLevel > 0) {
           await audio.play();
           fadeAudio(targetVolume * volumeLevel);
@@ -571,10 +751,23 @@
         animationFrame = requestAnimationFrame(drawVisualizer);
       }
 
-      document.removeEventListener('keydown', startWebsite);
+      document.removeEventListener('keydown', handleKeyStart);
     }
 
-    document.addEventListener('keydown', startWebsite);
+    // DESKTOP: PRESS ANY KEY
+    function handleKeyStart(event) {
+      // Don't start the website when someone is using the volume slider.
+      if (event.target === volumeSlider) return;
+
+      startWebsite();
+    }
+
+    document.addEventListener('keydown', handleKeyStart);
+
+    // MOBILE + DESKTOP: TAP OR CLICK STARTUP SCREEN
+    startup.addEventListener('click', startWebsite);
+
+    // PAUSE WHEN THE USER LEAVES THE TAB
 
     function checkFocus() {
       if (!hasStarted) return;
