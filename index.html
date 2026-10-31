@@ -128,21 +128,16 @@
       opacity: 0.7;
     }
 
-    /* Independent visualizer - NOT inside the zooming UI */
     .visualizer {
-      position: fixed;
-      left: 50%;
-      top: calc(50% + 105px);
-      transform: translateX(-50%);
       display: block;
       width: 440px;
       height: 100px;
+      margin: 2rem auto 0;
       opacity: 0;
       transition: opacity 1.5s ease;
-      pointer-events: none;
     }
 
-    body.started .visualizer {
+    .content.visible .visualizer {
       opacity: 0.75;
     }
 
@@ -188,9 +183,8 @@
       }
 
       .visualizer {
-        width: 85vw;
-        height: 90px;
-        top: calc(50% + 105px);
+        width: 300px;
+        height: 70px;
       }
     }
   </style>
@@ -228,9 +222,9 @@
       </div>
 
     </div>
-  </div>
 
-  <canvas class="visualizer" id="visualizer" width="880" height="200"></canvas>
+    <canvas class="visualizer" id="visualizer" width="880" height="200"></canvas>
+  </div>
 
   <a class="soundcloud-link"
      href="https://soundcloud.com/100gecs/hollywood-baby"
@@ -305,8 +299,9 @@
 
       audioContext = new AudioContext();
       analyser = audioContext.createAnalyser();
+
       analyser.fftSize = 64;
-      analyser.smoothingTimeConstant = 0.12;
+      analyser.smoothingTimeConstant = 0.45;
 
       const source = audioContext.createMediaElementSource(audio);
 
@@ -339,8 +334,6 @@
 
         const value = frequencyData[dataIndex] / 255;
         const amplifiedValue = Math.pow(value, 0.55);
-
-        // More vertical range for noticeable beat drops
         const barHeight = Math.max(5, amplifiedValue * 170);
 
         const x = i * (barWidth + gap);
@@ -348,11 +341,10 @@
 
         ctx.fillStyle = '#292929';
         ctx.beginPath();
-        ctx.roundRect(x, y, barWidth, barHeight, 7);
+        ctx.roundRect(x, y, barWidth, barHeight, 5);
         ctx.fill();
       }
 
-      // Bass-reactive zoom affects ONLY the main UI
       const bassLevel = (
         frequencyData[0] +
         frequencyData[1] +
@@ -360,6 +352,7 @@
       ) / 3;
 
       const bassAmount = Math.min(1, bassLevel / 255);
+
       const targetZoom = 1 + Math.pow(bassAmount, 0.65) * 0.12;
 
       const speed = targetZoom > currentZoom ? 0.45 : 0.30;
@@ -377,7 +370,6 @@
 
       startup.classList.add('hidden');
       content.classList.add('visible');
-      document.body.classList.add('started');
 
       setupVisualizer();
 
