@@ -323,18 +323,22 @@
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // VISUALIZER BARS
       const barCount = 32;
       const gap = 8;
       const barWidth = (canvas.width - gap * (barCount - 1)) / barCount;
 
       for (let i = 0; i < barCount; i++) {
         const dataIndex = Math.floor(
-          i * frequencyData.length / barCount
+          Math.pow(i / (barCount - 1), 1.6) * (frequencyData.length - 1)
         );
 
         const value = frequencyData[dataIndex] / 255;
-        const amplifiedValue = Math.pow(value, 0.55);
-        const barHeight = Math.max(5, amplifiedValue * 170);
+
+        // Increase contrast between quiet and loud frequencies
+        const amplifiedValue = Math.pow(value, 1.8);
+
+        const barHeight = Math.max(4, amplifiedValue * 190);
 
         const x = i * (barWidth + gap);
         const y = (canvas.height - barHeight) / 2;
@@ -345,6 +349,7 @@
         ctx.fill();
       }
 
+      // MUSIC-REACTIVE UI ZOOM
       const bassLevel = (
         frequencyData[0] +
         frequencyData[1] +
@@ -352,7 +357,6 @@
       ) / 3;
 
       const bassAmount = Math.min(1, bassLevel / 255);
-
       const targetZoom = 1 + Math.pow(bassAmount, 0.65) * 0.12;
 
       const speed = targetZoom > currentZoom ? 0.45 : 0.30;
