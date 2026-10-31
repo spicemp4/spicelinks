@@ -44,8 +44,6 @@
       z-index: -1;
     }
 
-    /* STARTUP SCREEN */
-
     .startup {
       position: fixed;
       inset: 0;
@@ -74,8 +72,6 @@
       visibility: hidden;
       pointer-events: none;
     }
-
-    /* MAIN CONTENT */
 
     .content {
       width: 100%;
@@ -116,8 +112,6 @@
       white-space: nowrap;
     }
 
-    /* SOCIAL LINKS */
-
     .links {
       display: flex;
       flex-wrap: wrap;
@@ -154,8 +148,6 @@
       pointer-events: none;
     }
 
-    /* AUDIO VISUALIZER */
-
     .visualizer {
       display: block;
       width: min(440px, 100%);
@@ -169,8 +161,6 @@
     .content.visible .visualizer {
       opacity: 0.75;
     }
-
-    /* SOUNDCLOUD LINK */
 
     .soundcloud-link {
       position: fixed;
@@ -188,8 +178,6 @@
       opacity: 1;
       transform: scale(1.1);
     }
-
-    /* GIF + VOLUME CONTROLS */
 
     .bottom-left-controls {
       position: fixed;
@@ -213,8 +201,6 @@
       visibility: visible;
       pointer-events: auto;
     }
-
-    /* VOLUME BAR */
 
     .volume-control {
       box-sizing: border-box;
@@ -297,8 +283,6 @@
       user-select: none;
     }
 
-    /* FUTURE GIF PLACEHOLDER */
-
     .gif-placeholder {
       width: 166px;
       height: 166px;
@@ -324,8 +308,6 @@
 
       flex: 0 0 auto;
     }
-
-    /* MOBILE LAYOUT */
 
     @media (max-width: 600px) {
       body {
@@ -361,8 +343,6 @@
         width: min(360px, 85vw);
         height: auto;
       }
-
-      /* Make the controls larger and easier to touch */
 
       .bottom-left-controls {
         bottom: calc(14px + env(safe-area-inset-bottom));
@@ -417,8 +397,6 @@
       }
     }
 
-    /* SMALL PHONES */
-
     @media (max-width: 380px) {
       .bottom-left-controls {
         left: 10px;
@@ -456,8 +434,6 @@
         opacity: 0.6;
       }
     }
-
-    /* REDUCE ANIMATIONS IF THE DEVICE REQUESTS IT */
 
     @media (prefers-reduced-motion: reduce) {
       *,
@@ -531,16 +507,16 @@
 
   </div>
 
-  <a class="soundcloud-link"
-     href="https://soundcloud.com/100gecs/hollywood-baby"
-     target="_blank"
-     rel="noopener noreferrer">
+  <a
+    class="soundcloud-link"
+    id="soundcloudLink"
+    href="https://soundcloud.com/crafter2011/six?in=crafter2011/sets/minecraft-vol-1&si=872c68c1206d45aba1ea5fbfa795d80c&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"
+    target="_blank"
+    rel="noopener noreferrer">
     soundcloud ♫
   </a>
 
-  <audio id="audio" loop preload="auto">
-    <source src="Hollywood_Baby_100_gecs.mp3" type="audio/mpeg" />
-  </audio>
+  <audio id="audio" preload="auto"></audio>
 
   <script>
     const audio = document.getElementById('audio');
@@ -552,17 +528,83 @@
     const ctx = canvas.getContext('2d', { alpha: true });
     const volumeSlider = document.getElementById('volumeSlider');
     const volumePercent = document.getElementById('volumePercent');
+    const soundcloudLink = document.getElementById('soundcloudLink');
 
     const targetVolume = 0.175;
     const fadeDuration = 1800;
     const frameInterval = 1000 / 60;
 
-    // Detect touch-based/mobile devices.
+    const tracks = [
+      {
+        file: '1.mp3',
+        url: 'https://soundcloud.com/crafter2011/six?in=crafter2011/sets/minecraft-vol-1&si=872c68c1206d45aba1ea5fbfa795d80c&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '2.mp3',
+        url: 'https://soundcloud.com/crafter2011/eight?in=crafter2011/sets/minecraft-vol-1&si=e720428d14d4426996af819f06ff8c88&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '3.mp3',
+        url: 'https://soundcloud.com/crafter2011/four?in=crafter2011/sets/minecraft-vol-1&si=cca11da77600476f81d93551511d1239&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '4.mp3',
+        url: 'https://soundcloud.com/crafter2011/three?in=crafter2011/sets/minecraft-vol-1&si=7406a244b0d34e7c8df583234a7d3909&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '5.mp3',
+        url: 'https://soundcloud.com/crafter2011/two?in=crafter2011/sets/minecraft-vol-1&si=8c7c41ea46dd4d29acf6315bff1f407d&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '6.mp3',
+        url: 'https://soundcloud.com/crafter2011/seven?in=crafter2011/sets/minecraft-vol-1&si=fbbd87edc95841db90fb069b62bc4ffd&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '7.mp3',
+        url: 'https://soundcloud.com/crafter2011/one?in=crafter2011/sets/minecraft-vol-1&si=651c920786bf4362a7cd515c37c5fea8&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '8.mp3',
+        url: 'https://soundcloud.com/crafter2011/ten?in=crafter2011/sets/minecraft-vol-1&si=99c4ee6da2eb42c7815d9d7f6f8e78bf&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '9.mp3',
+        url: 'https://soundcloud.com/crafter2011/fourteen?in=crafter2011/sets/minecraft-vol-1&si=48a97ad8e4f1493dbee5185eb12d77a2&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '10.mp3',
+        url: 'https://soundcloud.com/crafter2011/come-in?in=crafter2011/sets/minecraft-vol-1&si=02ed2232429d4d0d83323d3eca4a1ae6&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '11.mp3',
+        url: 'https://soundcloud.com/crafter2011/ghast-voices?in=crafter2011/sets/minecraft-vol-1&si=e1831a7131e04338b02882d86dd091af&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '12.mp3',
+        url: 'https://soundcloud.com/crafter2011/the-end?in=crafter2011/sets/minecraft-vol-1&si=cf35d5e7a7a44293aa71a82318d74455&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '13.mp3',
+        url: 'https://soundcloud.com/crafter2011/thirteen?in=crafter2011/sets/minecraft-vol-1&si=dc880afc8f914b9fb20f4d59facd0508&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '14.mp3',
+        url: 'https://soundcloud.com/crafter2011/eleven?in=crafter2011/sets/minecraft-vol-1&si=b6497652a72441e39cde936eecbc8c36&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '15.mp3',
+        url: 'https://soundcloud.com/crafter2011/account-migration?in=crafter2011/sets/minecraft-vol-1&si=63ccb0cd36a147c78a6bdfe4e4e4aa67&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      },
+      {
+        file: '16.mp3',
+        url: 'https://soundcloud.com/crafter2011/nine?in=crafter2011/sets/minecraft-vol-1&si=78955b6f5a214baa959378f30ce77fcc&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
+      }
+    ];
+
     const isMobile =
       window.matchMedia('(pointer: coarse)').matches ||
       navigator.maxTouchPoints > 0;
 
-    // Change the startup instructions depending on the device.
     if (isMobile) {
       startupText.textContent = 'TAP ANYWHERE TO START';
     } else {
@@ -581,15 +623,73 @@
     let isActive = true;
     let volumeLevel = 1;
 
-    audio.volume = 0;
+    let shuffledPlaylist = [];
+    let playlistPosition = 0;
+    let currentTrackIndex = null;
 
-    // VOLUME SLIDER
+    function shufflePlaylist() {
+      shuffledPlaylist = tracks.map((_, index) => index);
+
+      for (let i = shuffledPlaylist.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [shuffledPlaylist[i], shuffledPlaylist[j]] =
+          [shuffledPlaylist[j], shuffledPlaylist[i]];
+      }
+
+      if (
+        currentTrackIndex !== null &&
+        shuffledPlaylist.length > 1 &&
+        shuffledPlaylist[0] === currentTrackIndex
+      ) {
+        [shuffledPlaylist[0], shuffledPlaylist[1]] =
+          [shuffledPlaylist[1], shuffledPlaylist[0]];
+      }
+
+      playlistPosition = 0;
+    }
+
+    function setCurrentTrack(index) {
+      currentTrackIndex = index;
+
+      const track = tracks[index];
+
+      audio.src = track.file;
+      audio.load();
+
+      soundcloudLink.href = track.url;
+    }
+
+    function playNextTrack() {
+      if (playlistPosition >= shuffledPlaylist.length) {
+        shufflePlaylist();
+      }
+
+      const nextIndex = shuffledPlaylist[playlistPosition];
+      playlistPosition++;
+
+      setCurrentTrack(nextIndex);
+
+      if (hasStarted && isActive && volumeLevel > 0) {
+        audio.play().catch(error => {
+          console.log('Next track playback failed:', error);
+        });
+      }
+    }
+
+    shufflePlaylist();
+    playNextTrack();
+
+    audio.addEventListener('ended', () => {
+      playNextTrack();
+    });
+
+    audio.volume = 0;
 
     volumeSlider.addEventListener('input', () => {
       volumeLevel = Number(volumeSlider.value) / 100;
       volumePercent.textContent = `${volumeSlider.value}%`;
 
-      // Cancel an ongoing fade so the slider responds immediately.
       clearInterval(fadeInterval);
       fadeInterval = null;
       fadeToken++;
@@ -608,8 +708,6 @@
         }
       }
     });
-
-    // AUDIO FADING
 
     function fadeAudio(target) {
       clearInterval(fadeInterval);
@@ -644,8 +742,6 @@
       }, intervalTime);
     }
 
-    // VISUALIZER SETUP
-
     function setupVisualizer() {
       if (audioContext) return;
 
@@ -663,8 +759,6 @@
       frequencyData = new Uint8Array(analyser.frequencyBinCount);
     }
 
-    // DRAW VISUALIZER
-
     function drawVisualizer(timestamp) {
       animationFrame = requestAnimationFrame(drawVisualizer);
 
@@ -676,8 +770,6 @@
       analyser.getByteFrequencyData(frequencyData);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // VISUALIZER BARS
 
       const barCount = 16;
       const gap = 8;
@@ -704,8 +796,6 @@
         ctx.fill();
       }
 
-      // MUSIC-REACTIVE UI ZOOM
-
       const bassLevel = (
         frequencyData[0] +
         frequencyData[1] +
@@ -722,8 +812,6 @@
         content.style.transform = `translateY(0) scale(${currentZoom})`;
       }
     }
-
-    // START WEBSITE
 
     async function startWebsite() {
       if (hasStarted) return;
@@ -754,9 +842,7 @@
       document.removeEventListener('keydown', handleKeyStart);
     }
 
-    // DESKTOP: PRESS ANY KEY
     function handleKeyStart(event) {
-      // Don't start the website when someone is using the volume slider.
       if (event.target === volumeSlider) return;
 
       startWebsite();
@@ -764,10 +850,7 @@
 
     document.addEventListener('keydown', handleKeyStart);
 
-    // MOBILE + DESKTOP: TAP OR CLICK STARTUP SCREEN
     startup.addEventListener('click', startWebsite);
-
-    // PAUSE WHEN THE USER LEAVES THE TAB
 
     function checkFocus() {
       if (!hasStarted) return;
