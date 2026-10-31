@@ -31,8 +31,6 @@
       background: url('background.png') center center / cover no-repeat;
       filter: blur(7px) brightness(0.8);
       z-index: -1;
-      transform: none;
-      will-change: auto;
     }
 
     .startup {
@@ -130,16 +128,21 @@
       opacity: 0.7;
     }
 
+    /* Independent visualizer - NOT inside the zooming UI */
     .visualizer {
+      position: fixed;
+      left: 50%;
+      top: calc(50% + 105px);
+      transform: translateX(-50%);
       display: block;
-      width: 220px;
-      height: 45px;
-      margin: 1.5rem auto 0;
+      width: 440px;
+      height: 100px;
       opacity: 0;
       transition: opacity 1.5s ease;
+      pointer-events: none;
     }
 
-    .content.visible .visualizer {
+    body.started .visualizer {
       opacity: 0.75;
     }
 
@@ -183,6 +186,12 @@
         width: 18px;
         height: 18px;
       }
+
+      .visualizer {
+        width: 85vw;
+        height: 90px;
+        top: calc(50% + 105px);
+      }
     }
   </style>
 </head>
@@ -219,9 +228,9 @@
       </div>
 
     </div>
-
-    <canvas class="visualizer" id="visualizer" width="440" height="90"></canvas>
   </div>
+
+  <canvas class="visualizer" id="visualizer" width="880" height="200"></canvas>
 
   <a class="soundcloud-link"
      href="https://soundcloud.com/100gecs/hollywood-baby"
@@ -297,8 +306,6 @@
       audioContext = new AudioContext();
       analyser = audioContext.createAnalyser();
       analyser.fftSize = 64;
-
-      // Very light analyser smoothing
       analyser.smoothingTimeConstant = 0.12;
 
       const source = audioContext.createMediaElementSource(audio);
@@ -321,8 +328,8 @@
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const barCount = 16;
-      const gap = 7;
+      const barCount = 32;
+      const gap = 8;
       const barWidth = (canvas.width - gap * (barCount - 1)) / barCount;
 
       for (let i = 0; i < barCount; i++) {
@@ -331,20 +338,21 @@
         );
 
         const value = frequencyData[dataIndex] / 255;
+        const amplifiedValue = Math.pow(value, 0.55);
 
-        // Strong reaction with just a little smoothing
-        const amplifiedValue = Math.pow(value, 0.65);
-        const barHeight = Math.max(3, amplifiedValue * 88);
+        // More vertical range for noticeable beat drops
+        const barHeight = Math.max(5, amplifiedValue * 170);
 
         const x = i * (barWidth + gap);
         const y = (canvas.height - barHeight) / 2;
 
         ctx.fillStyle = '#292929';
         ctx.beginPath();
-        ctx.roundRect(x, y, barWidth, barHeight, 5);
+        ctx.roundRect(x, y, barWidth, barHeight, 7);
         ctx.fill();
       }
 
+      // Bass-reactive zoom affects ONLY the main UI
       const bassLevel = (
         frequencyData[0] +
         frequencyData[1] +
@@ -352,11 +360,8 @@
       ) / 3;
 
       const bassAmount = Math.min(1, bassLevel / 255);
-
-      // Increased maximum zoom to 12%
       const targetZoom = 1 + Math.pow(bassAmount, 0.65) * 0.12;
 
-      // Light smoothing: fast response, slight settling
       const speed = targetZoom > currentZoom ? 0.45 : 0.30;
       currentZoom += (targetZoom - currentZoom) * speed;
 
@@ -372,6 +377,7 @@
 
       startup.classList.add('hidden');
       content.classList.add('visible');
+      document.body.classList.add('started');
 
       setupVisualizer();
 
