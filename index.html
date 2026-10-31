@@ -132,7 +132,7 @@
       display: block;
       width: 440px;
       height: 100px;
-      margin: 2rem auto 0;
+      margin: 1rem auto 0;
       opacity: 0;
       transition: opacity 1.5s ease;
     }
@@ -324,11 +324,10 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // VISUALIZER BARS
-      const barCount = 10;
-      const gap = 4;
+      const barCount = 16;
+      const gap = 8;
       const barWidth = 25;
 
-      // Center the entire group of narrower bars
       const totalWidth = barCount * barWidth + (barCount - 1) * gap;
       const startX = (canvas.width - totalWidth) / 2;
 
@@ -339,7 +338,6 @@
 
         const value = frequencyData[dataIndex] / 255;
 
-        // Increase contrast between quiet and loud frequencies
         const amplifiedValue = Math.pow(value, 1.8);
 
         const barHeight = Math.max(4, amplifiedValue * 190);
