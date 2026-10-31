@@ -158,6 +158,139 @@
       transform: scale(1.1);
     }
 
+
+    /* VOLUME CONTROL + FUTURE GIF PLACEHOLDER */
+    .bottom-left-controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      z-index: 5;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 1.5s ease, visibility 1.5s ease;
+    }
+
+    .bottom-left-controls.visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .volume-control {
+      box-sizing: border-box;
+      width: 166px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 11px;
+      background: rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      color: #292929;
+      opacity: 0.7;
+      transition: opacity 0.25s ease;
+      flex: 0 0 auto;
+    }
+
+    .volume-control:hover,
+    .gif-placeholder:hover {
+      opacity: 1;
+    }
+
+    .volume-icon {
+      width: 13px;
+      flex: 0 0 13px;
+      font-size: 13px;
+      line-height: 1;
+      user-select: none;
+      text-align: center;
+    }
+
+    .volume-slider {
+      width: auto;
+      min-width: 0;
+      flex: 1 1 auto;
+      height: 4px;
+      appearance: none;
+      -webkit-appearance: none;
+      background: rgba(41, 41, 41, 0.2);
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #292929;
+      cursor: pointer;
+    }
+
+    .volume-slider::-moz-range-thumb {
+      width: 10px;
+      height: 10px;
+      border: none;
+      border-radius: 50%;
+      background: #292929;
+      cursor: pointer;
+    }
+
+    .volume-percent {
+      box-sizing: border-box;
+      width: 32px;
+      flex: 0 0 32px;
+      font-size: 0.7rem;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .gif-placeholder {
+      width: 166px;
+      height: 54px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px dashed rgba(41, 41, 41, 0.45);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(8px);
+      color: rgba(41, 41, 41, 0.65);
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+      user-select: none;
+      opacity: 0.7;
+      transition: opacity 0.25s ease;
+    }
+
+    @media (max-width: 600px) {
+      .bottom-left-controls {
+        bottom: 14px;
+        left: 14px;
+        gap: 8px;
+      }
+
+      .volume-control,
+      .gif-placeholder {
+        width: 151px;
+      }
+
+      .gif-placeholder {
+        height: 46px;
+        border-radius: 10px;
+      }
+    }
+
     @keyframes flash {
       0% {
         opacity: 1;
@@ -226,6 +359,24 @@
     <canvas class="visualizer" id="visualizer" width="880" height="200"></canvas>
   </div>
 
+  <div class="bottom-left-controls">
+    <div class="volume-control">
+      <span class="volume-icon">♫</span>
+      <input
+        type="range"
+        class="volume-slider"
+        id="volumeSlider"
+        min="0"
+        max="100"
+        value="100"
+        aria-label="Volume"
+      />
+      <span class="volume-percent" id="volumePercent">100%</span>
+    </div>
+
+    <div class="gif-placeholder" aria-label="GIF placeholder">GIF</div>
+  </div>
+
   <a class="soundcloud-link"
      href="https://soundcloud.com/100gecs/hollywood-baby"
      target="_blank"
@@ -241,8 +392,11 @@
     const audio = document.getElementById('audio');
     const startup = document.getElementById('startup');
     const content = document.getElementById('content');
+    const bottomLeftControls = document.querySelector('.bottom-left-controls');
     const canvas = document.getElementById('visualizer');
     const ctx = canvas.getContext('2d', { alpha: true });
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumePercent = document.getElementById('volumePercent');
 
     const targetVolume = 0.175;
     const fadeDuration = 1800;
@@ -258,8 +412,32 @@
     let lastFrame = 0;
     let currentZoom = 1;
     let isActive = true;
+    let volumeLevel = 1;
 
     audio.volume = 0;
+
+    volumeSlider.addEventListener('input', () => {
+      volumeLevel = Number(volumeSlider.value) / 100;
+      volumePercent.textContent = `${volumeSlider.value}%`;
+
+      // Cancel an ongoing fade so the slider responds immediately.
+      clearInterval(fadeInterval);
+      fadeInterval = null;
+      fadeToken++;
+
+      if (!hasStarted) return;
+
+      if (volumeLevel === 0) {
+        audio.volume = 0;
+        audio.pause();
+      } else if (isActive) {
+        audio.volume = targetVolume * volumeLevel;
+        if (audio.paused) {
+          audioContext.resume();
+          audio.play().catch(() => {});
+        }
+      }
+    });
 
     function fadeAudio(target) {
       clearInterval(fadeInterval);
@@ -376,13 +554,16 @@
 
       startup.classList.add('hidden');
       content.classList.add('visible');
+      bottomLeftControls.classList.add('visible');
 
       setupVisualizer();
 
       try {
         await audioContext.resume();
-        await audio.play();
-        fadeAudio(targetVolume);
+        if (volumeLevel > 0) {
+          await audio.play();
+          fadeAudio(targetVolume * volumeLevel);
+        }
       } catch (error) {
         console.log("Audio playback failed:", error);
       }
@@ -404,9 +585,11 @@
       if (isActive) {
         audioContext.resume();
 
-        audio.play().then(() => {
-          fadeAudio(targetVolume);
-        }).catch(() => {});
+        if (volumeLevel > 0) {
+          audio.play().then(() => {
+            fadeAudio(targetVolume * volumeLevel);
+          }).catch(() => {});
+        }
 
         if (!animationFrame) {
           lastFrame = 0;
