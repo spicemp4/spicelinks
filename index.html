@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -347,10 +346,15 @@
         frequencyData[2]
       ) / 3;
 
-      const bassAmount = bassLevel / 255;
-      const targetZoom = 1 + bassAmount * 0.08;
+      const bassAmount = Math.min(1, bassLevel / 255);
 
-      currentZoom += (targetZoom - currentZoom) * 0.25;
+      // More aggressive reaction without increasing maximum zoom
+      const targetZoom = 1 + Math.pow(bassAmount, 0.65) * 0.08;
+
+      // Fast zoom-in, slower zoom-out
+      const speed = targetZoom > currentZoom ? 0.55 : 0.18;
+
+      currentZoom += (targetZoom - currentZoom) * speed;
 
       if (hasStarted) {
         content.style.transform = `translateY(0) scale(${currentZoom})`;
