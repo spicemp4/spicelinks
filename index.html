@@ -158,7 +158,6 @@
       transform: scale(1.1);
     }
 
-
     /* VOLUME CONTROL + FUTURE GIF PLACEHOLDER */
     .bottom-left-controls {
       position: fixed;
@@ -256,7 +255,7 @@
 
     .gif-placeholder {
       width: 166px;
-      height: 54px;
+      height: 166px;
       box-sizing: border-box;
       display: flex;
       align-items: center;
@@ -286,7 +285,7 @@
       }
 
       .gif-placeholder {
-        height: 46px;
+        height: 151px;
         border-radius: 10px;
       }
     }
@@ -360,6 +359,8 @@
   </div>
 
   <div class="bottom-left-controls">
+    <div class="gif-placeholder" aria-label="GIF placeholder">GIF</div>
+
     <div class="volume-control">
       <span class="volume-icon">♫</span>
       <input
@@ -373,8 +374,6 @@
       />
       <span class="volume-percent" id="volumePercent">100%</span>
     </div>
-
-    <div class="gif-placeholder" aria-label="GIF placeholder">GIF</div>
   </div>
 
   <a class="soundcloud-link"
