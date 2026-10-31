@@ -298,8 +298,8 @@
       analyser = audioContext.createAnalyser();
       analyser.fftSize = 64;
 
-      // Completely disable audio analysis smoothing
-      analyser.smoothingTimeConstant = 0;
+      // Very light analyser smoothing
+      analyser.smoothingTimeConstant = 0.12;
 
       const source = audioContext.createMediaElementSource(audio);
 
@@ -332,7 +332,7 @@
 
         const value = frequencyData[dataIndex] / 255;
 
-        // More sensitive bars with stronger reactions
+        // Strong reaction with just a little smoothing
         const amplifiedValue = Math.pow(value, 0.65);
         const barHeight = Math.max(3, amplifiedValue * 88);
 
@@ -353,11 +353,12 @@
 
       const bassAmount = Math.min(1, bassLevel / 255);
 
-      // Aggressive UI zoom, capped at 8%
-      const targetZoom = 1 + Math.pow(bassAmount, 0.65) * 0.08;
+      // Increased maximum zoom to 12%
+      const targetZoom = 1 + Math.pow(bassAmount, 0.65) * 0.12;
 
-      // No smoothing: instantly follows the bass
-      currentZoom = targetZoom;
+      // Light smoothing: fast response, slight settling
+      const speed = targetZoom > currentZoom ? 0.45 : 0.30;
+      currentZoom += (targetZoom - currentZoom) * speed;
 
       if (hasStarted) {
         content.style.transform = `translateY(0) scale(${currentZoom})`;
