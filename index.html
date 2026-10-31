@@ -241,9 +241,9 @@
     const canvas = document.getElementById('visualizer');
     const ctx = canvas.getContext('2d', { alpha: true });
 
-    const targetVolume = 0.35;
+    const targetVolume = 0.175;
     const fadeDuration = 1800;
-    const frameInterval = 1000 / 30;
+    const frameInterval = 1000 / 60;
 
     let fadeInterval = null;
     let fadeToken = 0;
@@ -297,7 +297,9 @@
       audioContext = new AudioContext();
       analyser = audioContext.createAnalyser();
       analyser.fftSize = 64;
-      analyser.smoothingTimeConstant = 0.7;
+
+      // Completely disable audio analysis smoothing
+      analyser.smoothingTimeConstant = 0;
 
       const source = audioContext.createMediaElementSource(audio);
 
@@ -329,7 +331,10 @@
         );
 
         const value = frequencyData[dataIndex] / 255;
-        const barHeight = Math.max(3, value * 78);
+
+        // More sensitive bars with stronger reactions
+        const amplifiedValue = Math.pow(value, 0.65);
+        const barHeight = Math.max(3, amplifiedValue * 88);
 
         const x = i * (barWidth + gap);
         const y = (canvas.height - barHeight) / 2;
@@ -348,13 +353,11 @@
 
       const bassAmount = Math.min(1, bassLevel / 255);
 
-      // More aggressive reaction without increasing maximum zoom
+      // Aggressive UI zoom, capped at 8%
       const targetZoom = 1 + Math.pow(bassAmount, 0.65) * 0.08;
 
-      // Fast zoom-in, slower zoom-out
-      const speed = targetZoom > currentZoom ? 0.55 : 0.18;
-
-      currentZoom += (targetZoom - currentZoom) * speed;
+      // No smoothing: instantly follows the bass
+      currentZoom = targetZoom;
 
       if (hasStarted) {
         content.style.transform = `translateY(0) scale(${currentZoom})`;
